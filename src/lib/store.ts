@@ -1,6 +1,7 @@
 import { Hunt, Stage, Team, StageProgress, ScanLog, UserProfile, LeaderboardEntry } from '../types';
 import { INITIAL_HUNT, INITIAL_STAGES, INITIAL_TEAMS, INITIAL_USERS } from './mockData';
 import { hashAnswer } from './security';
+import { CloudSync } from './cloudSync';
 
 const STORAGE_KEYS = {
   HUNTS: 'hacksprint_hunts',
@@ -60,18 +61,50 @@ function loadFromStorage<T>(key: string, fallback: T): T {
   }
 }
 
-function saveToStorage<T>(key: string, data: T): void {
+function saveToStorage<T>(key: string, data: T, broadcastToCloud = true): void {
   try {
     localStorage.setItem(key, JSON.stringify(data));
+    if (broadcastToCloud) {
+      CloudSync.broadcastMutation(key, data);
+    }
   } catch (e) {
     console.error('Storage write error:', e);
   }
 }
 
+// Global Cloud Sync initialization (connects mobile phone and laptop in realtime)
+if (typeof window !== 'undefined') {
+  CloudSync.init(
+    // onRemoteMutation
+    (key: string, data: any) => {
+      saveToStorage(key, data, false);
+      notifyListeners();
+    },
+    // getFullState
+    () => {
+      const state: Record<string, any> = {};
+      Object.values(STORAGE_KEYS).forEach(k => {
+        try {
+          const val = localStorage.getItem(k);
+          if (val) state[k] = JSON.parse(val);
+        } catch {}
+      });
+      return state;
+    },
+    // onApplyFullState
+    (state: Record<string, any>) => {
+      Object.entries(state).forEach(([k, v]) => {
+        saveToStorage(k, v, false);
+      });
+      notifyListeners();
+    }
+  );
+}
+
 // Initialize default data if absent
 function ensureInitialData() {
   if (!localStorage.getItem(STORAGE_KEYS.HUNTS)) {
-    saveToStorage(STORAGE_KEYS.HUNTS, [INITIAL_HUNT]);
+    saveToStorage(STORAGE_KEYS.HUNTS, [INITIAL_HUNT], false);
   }
   if (!localStorage.getItem(STORAGE_KEYS.STAGES)) {
     saveToStorage(STORAGE_KEYS.STAGES, INITIAL_STAGES);

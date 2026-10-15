@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Zap, Shield, User, LogOut, Smartphone, Monitor } from 'lucide-react';
+import { Zap, Shield, User, LogOut, Smartphone, Monitor, Radio } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { CloudSync } from '../../lib/cloudSync';
 
 export const Navbar: React.FC = () => {
   const { user, role, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [cloudConnected, setCloudConnected] = useState(CloudSync.isConnected());
+
+  useEffect(() => {
+    return CloudSync.onStatusChange((connected) => {
+      setCloudConnected(connected);
+    });
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 glass-panel border-b border-slate-800/80 backdrop-blur-md">
@@ -27,6 +35,12 @@ export const Navbar: React.FC = () => {
               </span>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 v1.0
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[9px] font-mono px-2 py-0.5 rounded-full bg-slate-900/90 border border-slate-800">
+                <span className={`w-1.5 h-1.5 rounded-full ${cloudConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                <span className={cloudConnected ? 'text-emerald-300 font-bold' : 'text-amber-300'}>
+                  {cloudConnected ? 'Live Cloud' : 'Syncing'}
+                </span>
               </span>
             </div>
             <p className="text-[10px] text-slate-400 tracking-wider uppercase font-mono">
