@@ -11,9 +11,9 @@ export const INITIAL_HUNT: Hunt = {
 };
 
 // SHA-256 precomputations for normalized strings:
-// 'sprint' -> 'c7ea0bb0e14a27a0868f054707297e684eb2e5d992f02da6d9e03dff659ae218'
-// 'hacksprint' -> '81bf4ef8c991b106260ecf937d7c6670e0a5c48b2d8d85f7560868da6c3ce136'
-// 'o(1)' -> '018659d57a3e8e2fa514cf6ffc1f0165c71b69f6e1f0e42d765b1614741c911d'
+// 'sprint' -> 'fb9afa84739c3239a0f5a57153fa5e9e2367f1adb4d2ef9a2c47f2cba31a74b0'
+// 'hacksprint' -> '6e7935681cf91c806595c2bc83cfb50126b05271a487c92699be26ca7310eaa3'
+// 'o(1)' -> '79a6652f8ffde77c2c086d624deecf37bc75cfca76ff51daab0dc2ddc8d20ff7'
 
 export const INITIAL_STAGES: Stage[] = [
   {
@@ -24,7 +24,7 @@ export const INITIAL_STAGES: Stage[] = [
     clue: 'Locate the main server hub or registration counter. Search for the neon green checkpoint labeled [GATEWAY-01].',
     puzzleQuestion: 'Decode this 8-bit binary stream to reveal the password:\n01010011 01010000 01010010 01001001 01001110 01010100',
     puzzleType: 'text',
-    correctAnswerHash: 'c7ea0bb0e14a27a0868f054707297e684eb2e5d992f02da6d9e03dff659ae218',
+    correctAnswerHash: 'fb9afa84739c3239a0f5a57153fa5e9e2367f1adb4d2ef9a2c47f2cba31a74b0',
     plainAnswerHint: 'sprint',
     qrSecretToken: 'HS_SEC_ALPHA_8892',
     points: 100,
@@ -38,7 +38,7 @@ export const INITIAL_STAGES: Stage[] = [
     clue: 'Proceed to the hardware makerspace workbench where microcontrollers and soldering irons are stored.',
     puzzleQuestion: 'A corrupted transmission was intercepted, shifted forward by 3 letters in Caesar Cipher:\n"KDFNV SULQW"\nReverse the cipher by 3 letters to decode the codeword (without spaces).',
     puzzleType: 'text',
-    correctAnswerHash: '81bf4ef8c991b106260ecf937d7c6670e0a5c48b2d8d85f7560868da6c3ce136',
+    correctAnswerHash: '6e7935681cf91c806595c2bc83cfb50126b05271a487c92699be26ca7310eaa3',
     plainAnswerHint: 'hacksprint',
     qrSecretToken: 'HS_SEC_BETA_4419',
     points: 200,
@@ -52,7 +52,7 @@ export const INITIAL_STAGES: Stage[] = [
     clue: 'Ascend to the Main Presentation Arena podium near the central projector control desk.',
     puzzleQuestion: 'What is the average time complexity of a hash table lookup operation in Big-O notation?\n(Format example: O(1))',
     puzzleType: 'text',
-    correctAnswerHash: '018659d57a3e8e2fa514cf6ffc1f0165c71b69f6e1f0e42d765b1614741c911d',
+    correctAnswerHash: '79a6652f8ffde77c2c086d624deecf37bc75cfca76ff51daab0dc2ddc8d20ff7',
     plainAnswerHint: 'o(1)',
     qrSecretToken: 'HS_SEC_GAMMA_7731',
     points: 300,
