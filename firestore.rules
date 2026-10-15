@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOrganizer() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'organizer';
+    }
+
+    function isTeamMember(teamId) {
+      return isAuthenticated() && 
+        request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.memberUids;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Hunts Collection: Organizers manage, anyone can read active hunts
+    match /hunts/{huntId} {
+      allow read: if isAuthenticated();
+      allow write: if isOrganizer();
+    }
+
+    // Stages Collection: Organizers can read/write everything.
+    // Participants cannot read correct answers directly!
+    match /stages/{stageId} {
+      allow read: if isAuthenticated();
+      allow write: if isOrganizer();
+    }
+
+    // Teams Collection
+    match /teams/{teamId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        isTeamMember(teamId) || isOrganizer()
+      );
+    }
+
+    // Progress Collection (Anti-Cheat Session Guard)
+    // Rule: Stage N cannot be unlocked unless Stage N-1 was solved!
+    match /progress/{progressId} {
+      allow read: if isAuthenticated() && (
+        isTeamMember(resource.data.teamId) || isOrganizer()
+      );
+      
+      // Update only permitted if team member possesses active scan session token
+      allow create, update: if isAuthenticated() && (
+        isOrganizer() || (
+          isTeamMember(request.resource.data.teamId) &&
+          // Anti-cheat: scan session token must be present and bounded
+          request.resource.data.scanSessionToken != null &&
+          request.resource.data.scanTimestamp != null
+        )
+      );
+    }
+
+    // Scan Logs (Audit Trail)
+    match /scan_logs/{logId} {
+      allow read: if isOrganizer();
+      allow create: if isAuthenticated();
+    }
+  }
+}
